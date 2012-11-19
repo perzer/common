@@ -1,0 +1,49 @@
+前言--术语说明
+    * 修订版（revision）：可以认为是某个文件在其生命周期内各个保存的快照，每个快照和一个时间区间对应。
+    * 版本库（Repository）：存放修订版的数据库
+    * 本地工作拷贝（Local working copy）：修订版在本地的副本
+    * 版本的检入（Check in）：本地副本提交到服务器的版本库
+    * 检出（Check out）：从服务器的版本库中取出修订版成为本地副本
+    * 版本号的来源：有两种策略，基于文件的计数和基于仓库的计数，subversion使用后者
+    * 标签（Tags）：为版本加一个名字，便于检出
+    * 分支（Branches）：修订版打分支，以后可以平行修改，互不干扰
+    * 合并（Merging）：将分支的修订版合并为一个新的修订版
+    * 锁（Locking）：为修订版枷锁
+    * 冲突（Conflict）：并发版本控制时防止修订版混乱的错误机制
+
+1、服务器端
+	1）svnadmin create file_path/repo_name，创建版本库
+	2）svnserve -d -r file_path，启动服务器，其中-d 后台执行，-r版本库的根目录，访问地址：svn://localhost/repo_name
+	
+2、客户端
+	1）初始导入（import）：svn import -m "init import" http://10.0.0.6/svn/teaching/
+	2）检出（checkout）：svn checkout(co) https://auth-sha.googlecode.com/svn/trunk/
+	3）保持更新（update）：svn update(up)
+	4）添加（add）：svn add file_path，告知svn服务器，添加目录和/或文件到服务器上，这个操作类似SQL的insert，但是并没有真的操作，直到commit。 
+	5）提交改动：svn commit(ci)，一般提交需要有注释，如svn ci -m "修改bug 25 fix"
+	6）还原改动：svn revert，这个操作对开发人员十分有用，在改动被人很多代码后可以“一键恢复”。 
+	7）还原已提交的改动，revert只适合未提交的情况。如果已经提交，发现问题，要回退到之前的修订版。
+		首先需要：svn up，让本地保持最新；然后 svn log your_file_path，查看文件日志，查看两个版本的不同：svn diff -r 旧修订版序号：新修订版序号 your_file_path
+		决定用哪个旧的修订版号后，用旧的修订版号文件覆盖新的修订版号文件。svn merge -r 新修订版本号：旧修订版本号 your_file_path，还需要svn commit -m "恢复到某修改版本"
+	8）svn copy(cp) path/file_name newpath/new_file_name
+		svn commit -m "tip"
+	9）重命名目录/文件
+		svn move(mv) file_name new_file_name
+	10）删除文件
+		svn delete(del) file_path
+	11）使用标签和分支
+		在svn中标签和分支都源于copy命令，3个约定俗成的目录：
+		    * trunk：主干
+		    * branches：分支
+		    * tags：标签
+		  发布分支：
+			svn cp -m "创建用于实现radio标签的分支" https://easymorse-simpletag.googlecode.com/svn/branches/simpletag_select_1 
+			https://easymorse-simpletag.googlecode.com/svn/branches/simpletag_select_2
+		切换分支：
+			svn switch https://easymorse-simpletag.googlecode.com/svn/branches/simpletag_select_2
+		合并分支需要两个步骤：
+			合并操作
+			svn merge -r 33:HEAD https://easymorse-simpletag.googlecode.com/svn/branches/simpletag_select_2
+			或者：
+			svn merge https://easymorse-simpletag.googlecode.com/svn/trunk/simpletag@HEAD https://easymorse-simpletag.googlecode.com/svn/branches/simpletag_select_1@HEAD
+

@@ -1,0 +1,11 @@
+windows
+javac -classpath . -cp activation.jar;mail.jar SendMail.java
+
+java  -cp .;activation.jar;mail.jar SendMail
+
+linux
+javac -classpath . -cp activation.jar:mail.jar SendMail.java
+
+java  -cp .:activation.jar:mail.jar SendMail
+
+native2acsii -reverse

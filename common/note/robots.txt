@@ -1,0 +1,18 @@
+robots.txt是搜索引擎中访问网站的时候要查看的第一个文件。Robots.txt文件告诉蜘蛛程序在服务器上什么文件是可以被查看的。 
+
+robots.txt必须放置在一个站点的根目录下，而且文件名必须全部小写。
+　　语法：最简单的 robots.txt 文件使用两条规则：
+　　· User-Agent: 适用下列规则的漫游器
+　　· Disallow: 要拦截的网页
+
+User-agent:
+　　该项的值用于描述搜索引擎robot的名字。在"robots.txt"文件中，如果有多条User-agent记录说明有多个robot会受到"robots.txt"的限制，对该文件来说，至少要有一条User-agent记录。如果该项的值设为*，则对任何robot均有效，在"robots.txt"文件中，"User-agent:*"这样的记录只能有一条。如果在"robots.txt"文件中，加入"User-agent:SomeBot"和若干Disallow、Allow行，那么名为"SomeBot"只受到"User-agent:SomeBot"后面的Disallow和Allow行的限制。
+　　Disallow:
+　　该项的值用于描述不希望被访问的一组URL，这个值可以是一条完整的路径，也可以是路径的非空前缀，以Disallow项的值开头的URL不会被robot访问。例如"Disallow:/help"禁止robot访问/help.html、/helpabc.html、/help/index.html，而"Disallow:/help/"则允许robot访问/help.html、/helpabc.html，不能访问/help/index.html。"Disallow:"说明允许robot访问该网站的所有url，在"/robots.txt"文件中，至少要有一条Disallow记录。如果"/robots.txt"不存在或者为空文件，则对于所有的搜索引擎robot，该网站都是开放的。
+Allow:
+　　该项的值用于描述希望被访问的一组URL，与Disallow项相似，这个值可以是一条完整的路径，也可以是路径的前缀，以Allow项的值开头的URL是允许robot访问的。例如"Allow:/hibaidu"允许robot访问/hibaidu.htm、/hibaiducom.html、/hibaidu/com.html。一个网站的所有URL默认是Allow的，所以Allow通常与Disallow搭配使用，实现允许访问一部分网页同时禁止访问其它所有URL的功能。
+　　需要特别注意的是Disallow与Allow行的顺序是有意义的，robot会根据第一个匹配成功的Allow或Disallow行确定是否访问某个URL。
+　　使用"*"和"$"：
+　　Baiduspider支持使用通配符"*"和"$"来模糊匹配url。
+　　"$" 匹配行结束符。
+　　"*" 匹配0或多个任意字符。 

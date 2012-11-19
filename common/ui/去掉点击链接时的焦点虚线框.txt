@@ -1,0 +1,6 @@
+1.在IE中，给a标签加上hidefoucs="true"
+     在firefox中，可以加上sytle="outline:none"
+     
+2.在css中统一定义
+a{blur:expression(this.blur());} //针对IE，对性能可能有影响
+a{outline:none;}//firefox
