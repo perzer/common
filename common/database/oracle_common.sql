@@ -90,53 +90,10 @@ SELECT * FROM TAB;
 --赋予debug权限
 grant debug connect session to username;
 
-/*
- * oracle sqlplus方向键使用 rlwrap:http://utopia.knoware.nl/~hlub/rlwrap/rlwrap-0.37.tar.gz
- * 在.bash_profile中配置如下
- * alias sqlplus='rlwrap sqlplus'
- * alias rman='rlwrap rman'
- */
-
-/*
-ORACLE exp/imp命令详解：
-exp/imp一共有四种模式：Full、User、Tables、Tablespaces
-Full
-要执行Full模式的导出，必须具有EXP_FULL_DATABASE的权限。在Full模式下将导出数据库中所有用户的对象，但是有几个用户是受 oracle保护的不能被exp导出
-（ORDSYS 、MDSYS 、CTXSYS 、ORDPLUGINS 、LBACSYS）sys用户的对象也不会导出，因此在full模式导出时属于sys用户的一些触发器之类的对象将会丢
-失，在导入后应该手工创建。
-Users
-具有create session的用户，即可对属于自己的schame进行导出。Users模式将导出该模式下所有的对象及对象权限（不包括系统权限）等。
-Tables
-导出指定的表(表名可用通配符%)，当数据库中存在较大的表时，可以利用该模式进行并行导出可以加快速度。对于分区表，可以利用该模式导出某个或全部分区。
-对于集群表导出时将不包含集群定义而以非集群方式导出，因此可以用这种模式取消表集群。
-Tablespaces
-进行Tablespaces模式主要用于进行transport Tablespaces，必须以sysdba权限才能进行。
-除此之外，transport Tablespaces如果条件允许可以使用的话，应该是最快的数据迁移方式，因为它是直接进行操作系统文件拷贝。
-
-参数介绍
-Buffer
-exp用这个参数来确定一次fetch所获取的最大行数。其默认值是由操作系统决定的，单位是byte。可以用buffer_size = rows_in_array * maximum_row_size来大概估算所需的大小，较大的rows_in_array能提高性能，但也不是越大越好（TOM建议100左右是个比较合适的值，但是不知道根据是什么）。当buffer设置为0时，exp将一行一行的获取，而且当表中含有LONG, LOB, BFILE, REF, ROWID, LOGICAL ROWID, DATE类型的列时，exp将忽略buffer的设置也将一行一行获取。在计算row_size时要注意每一列应加上两个byte的分隔符(null)长度，这个分隔符（null）是exp自动添加的，用以区别列与列。例如T（id varchar2(20),name varchar2(30)）则maximum_row_size=54（20+2+30+2）。
-Buffer参数只对常规路径导出生效，直接路径导出有个与之相对的参数RecoredLength。
-Compress
-Compress参数不是设置对导出的内容进行压缩，而是指示exp如何控制create table中的storage语句。当compress设置为Y时，storage语句将包含一个和当前对象所占extent总和相当的一个初始 extent（这个初始extent可能很大），这样在导入时所有数据将都在初始extent中。设置为N时，将保持原始的参数设置。
-这个参数默认值是Y，当不了解这个参数的设置时可能会造成一些错误。有一个故事是：有人想利用rows=n导出某个表结构，在原库中这个用户的表数据大概有20个G。当他设置rows=n时，他认为只需要很少的存储空间就可以完成导出。但是当导出进行时，他很诧异的发现所需空间不断膨胀，结果磁盘空间不够了只好不断删除旧文件凑空间，最后发现导出的文件所用空间和原来所占空间几乎一样。这里就是compress在捣乱。
-File
-File参数指定了导出文件的存储位置和存储文件名，结合参数FILESIZE使用可以指定多个文件名。
-Filesize
-在某些平台下文件的大小是有限制的，当导出的对象较大时就需要使用这个参数来指定文件的最大值。它必须配合FILE参数进行使用，file参数指定多个文件，当文件的值达到filesize时，exp自动转到下一个文件继续写。
-File，Filesize组合在一起使用时，可以实现一边exp，一边imp的效果，这样就大大减少了等待时间。Exp的时候指定多个file name等导出一两个file后就可以开始进行imp了。但是要注意潜在的风险，因为exp可能会失败。
-Rows
-指定导出时，是否包括表中的数据行（注意compress参数）。
-Query
-Exp通过该参数提供导出表中一部分数据的功能。利用 query可以进行一些特殊操作，例如当我们需要导出一个非分区的大表时，可以使用query=where_clause 人为的将表分成几个不重叠部分进行并行导出，这样可以加快导出速度，再结合file，filesize还可以边exp边imp。
-Direct
-Direct指示exp使用常规路径导出（N）还是直接路径导出（Y）。当设置为Y它是一个很有用的提速参数，它带来的速度提升是非常惊人的。在一般的情况下都应该设置为Y，但是很遗憾，其默认值为N（在 10g 的data pump中这个情况已经改变）。关于direct的原理我一直没有弄得很清楚，有人说是类似于direct path read，但是官方文档上的解释并非如此。官方解释是direct=Y和direct=N相比90%的路径都是相同的，只是绕过了SQL evaluation buffer。Evaluation buffer主要是用于where 子句的处理，列格式的转化等功能，基于此当direct=Y时，query参数是非法的。注意，当表中含有lobs列时，即使指定 direct=Y，oracle也将使用常规路径导出这些表。
-
 --导入
-imp system/manager file=bible_db log=dible_db full=y ignore=y
+imp system/manager file=dmp log=log full=y(formuser=user) ignore=y 
 --导出
 exp system/manager file=dir full=y(owner=username)
-*/
 
 /*
  生成执行计划：
