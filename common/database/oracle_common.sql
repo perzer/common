@@ -18,6 +18,19 @@ Database Buffers          130023424 bytes
 Redo Buffers                 262144 bytes
 Database mounted.
 Database opened.
+/*
+ * 1.删除数据库对象
+ * 2.删除JOB
+ */
+--删除数据库对象
+SELECT 'DROP ' || T.OBJECT_TYPE || ' ' || T.OBJECT_NAME || ';' FROM USER_OBJECTS T
+WHERE T.OBJECT_TYPE NOT IN ('INDEX','LOB')
+ORDER BY T.OBJECT_TYPE,T.OBJECT_NAME;
+--删除JOB
+SELECT 'EXEC DBMS_JOB.REMOVE(' || T.JOB || ');'
+	FROM USER_JOBS T
+UNION ALL
+SELECT 'COMMIT;' FROM DUAL;
 
 --执行job
 EXEC DBMS_JOB.RUN('41');
