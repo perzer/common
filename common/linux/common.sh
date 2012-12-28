@@ -130,3 +130,6 @@ sudo rmmod psmouse
 sudo modprobe psmouse
 
 批量修改文件后缀名: rename 's/.c/.h/'  ./* (把当前目录下的后缀名为.c的文件更改为.h的文件)
+
+查看服务器型号：dmidecode |grep Product
+查看服务器操作系统：cat /etc/issue
