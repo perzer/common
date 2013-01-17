@@ -83,6 +83,7 @@ public class QDOperate {
 	private static final String FORUM_HOME_URL = "http://forum.qidian.com/Manage/ForumManage.aspx?forumId={0}";
 	private static final String AUTHOR_DEL_CHAPTER_REFERER = "http://author.qidian.com/BookMan/ChapterVolumeMan.aspx?authorBookId={0}&authorBookName={1}";
 	private static final String GET_CHAPTERID_URL = "http://author.qidian.com/Ajax/BookMan.ashx";
+    private static final String GET_OLD_EXP_URL = "http://me.qidian.com/Ajax/Occupation.ashx?ajaxMethod=getoldexp&random={0}";
 	private static final Logger log = Logger.getLogger(QDOperate.class);
 	private DefaultHttpClient httpclient = new DefaultHttpClient();
 	private List<NameValuePair> formparams;
@@ -182,7 +183,7 @@ public class QDOperate {
 
 	/**
 	 * 回复主题
-	 * @param threadURL 主题URL
+	 * @param ThreadUrl 主题URL
 	 * @param content 回复内容
 	 * @param isLow 是否是低于500分的帐号
 	 */
@@ -298,7 +299,7 @@ public class QDOperate {
 	 * 批量回复主题
 	 * @param content 回复内容
 	 * @param isLow 帐号是否低于500积分
-	 * @param fielpath 文件路径
+	 * @param filepath 文件路径
 	 * 			其中文件要求如下，一行放一个主题URL
 	 * @return 得到评论积分
 	 * @throws Exception
@@ -1413,6 +1414,25 @@ public class QDOperate {
 			break;
 		}
 	}
+
+    /**
+     * 领取2013.01.17之前的经验
+     */
+    public void getOldExp() throws Exception {
+        HttpResponse response = null;
+        HttpGet get = null;
+        String result = "";
+        try {
+            get = new HttpGet(MessageFormat.format(GET_OLD_EXP_URL, Math.random()));
+            get.setHeader("Referer", "http://me.qidian.com/Index.aspx");
+            response = httpclient.execute(get);
+            result = EntityUtils.toString(response.getEntity());
+            log.info(result.substring(result.indexOf("Msg\":\"") + 6, result.lastIndexOf("\"")));
+
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
 
 	/**
 	 * 释放HttpClient连接
