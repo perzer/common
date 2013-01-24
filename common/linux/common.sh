@@ -118,11 +118,7 @@ ps -ef|grep LOCAL=NO|grep -v grep|cut -c 9-15|xargs kill -9
 "xargs kill -9" 中的 xargs 命令是用来把前面命令的输出结果（PID）作为"kill -9"命令的参数，并执行该命令。"kill -9"会强行杀掉指定进程。
 其它类似的情况，只需要修改"grep LOCAL=NO"中的关键字部分就可以了。
 
-plink -N Username@ip -pw Password -D 127.0.0.1:7070
-
-Username：为你的SSH账号
-qiang.be：为服务器域名或IP
-Password：为你的SSH密码
+设置SSH代理：plink -N Username@ip -pw Password -P port -D 127.0.0.1:7070
 
 关闭笔记本触摸板 ：
 sudo rmmod psmouse
