@@ -32,6 +32,11 @@ SELECT 'EXEC DBMS_JOB.REMOVE(' || T.JOB || ');'
 UNION ALL
 SELECT 'COMMIT;' FROM DUAL;
 
+--查询所有的dblink
+SELECT * FROM ALL_DB_LINKS;
+--删除dblink
+DROP PUBLIC DATABASE LINK link_name;
+
 --执行job
 EXEC DBMS_JOB.RUN('41');
 
