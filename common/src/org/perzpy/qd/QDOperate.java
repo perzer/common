@@ -85,6 +85,9 @@ public class QDOperate {
 	private static final String GET_CHAPTERID_URL = "http://author.qidian.com/Ajax/BookMan.ashx";
     private static final String GET_OLD_EXP_URL = "http://me.qidian.com/Ajax/Occupation.ashx?ajaxMethod=getoldexp&random={0}";
     private static final String MY_PET_URL = "http://me.qidian.com/pet/myPet.aspx";
+    private static final String ACTIVITY_HOME_URL = "http://me.qidian.com/profile/activity.aspx";
+    private static final String ACTIVITY_HOME_EXECUTE = "http://me.qidian.com/Ajax/Missions.ashx?ajaxMethod=getfinishdaymissionnum";
+    private static final String FRIEND_HOME_URL = "http://me.qidian.com/friendIndex.aspx?id={0}";
 	private static final Logger log = Logger.getLogger(QDOperate.class);
 	private DefaultHttpClient httpclient = new DefaultHttpClient();
 	private List<NameValuePair> formparams;
@@ -1439,14 +1442,36 @@ public class QDOperate {
      * 宠物签到
      */
     public void signMyPet() throws Exception {
-        try {
-            HttpGet get = new HttpGet(MY_PET_URL);
-            get.setHeader("Referer", "http://me.qidian.com/Index.aspx");
-            httpclient.execute(get);
-            get.abort();
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
+        visitURLByGet(MY_PET_URL);
+    }
+    
+    /**
+     * 获取活跃度
+     * @throws Exception
+     */
+    public void getActivity() throws Exception {
+    	visitURLByGet(ACTIVITY_HOME_URL);
+    	visitURLByGet(ACTIVITY_HOME_EXECUTE);
+		String[] friends = new String[] { "3188362", "130116907", "12685579", "21456503", "115921869", "610769" };
+		for (int i = 0; i < friends.length; i++) {
+			visitURLByGet(MessageFormat.format(FRIEND_HOME_URL, friends[i]));
+		}
+    }
+    
+    /**
+     * 通过get方式访问指定网址
+     * @param url
+     * @throws Exception
+     */
+    private void visitURLByGet(String url) throws Exception {
+    	 try {
+             HttpGet get = new HttpGet(url);
+             get.setHeader("Referer", "http://me.qidian.com/Index.aspx");
+             httpclient.execute(get);
+             get.abort();
+         } catch (Exception e) {
+             throw new Exception(e.getMessage());
+         }
     }
 
 	/**
