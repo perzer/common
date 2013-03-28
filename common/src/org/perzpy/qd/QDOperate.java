@@ -243,12 +243,17 @@ public class QDOperate {
 					result.indexOf("var curThreadId = \"") - 4);
 			String curThreadId = null;
 
-			if (threadUrl.contains("qidian")) {
+			/*if (threadUrl.contains("qidian")) {
 				curThreadId = result.substring(result.indexOf("curThreadId = \"") + 15,
 						result.indexOf("var curReviewId;") - 4);
 			} else {
 				curThreadId = result.substring(result.indexOf("curThreadId = \"") + 15,
 						result.indexOf("var curReviewId;") - 6);
+			}*/
+			if (threadUrl.contains("?threadid=")) {
+				curThreadId = threadUrl.substring(threadUrl.indexOf("?threadid=") + 10);
+			} else {
+				log.info(threadUrl + "回帖地址出错，回帖失败！");
 			}
 			log.info("书评区ID：" + curForumId + "，帖子ID：" + curThreadId);
 
