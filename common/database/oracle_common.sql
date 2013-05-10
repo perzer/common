@@ -105,13 +105,23 @@ SELECT TABLE_NAME FROM DBA_TABLES；
 --或者
 SELECT * FROM TAB;
 
---赋予debug权限
-grant debug connect session to username;
-
 --导入
 imp system/manager file=dmp log=log full=y(formuser=user) ignore=y 
 --导出
 exp system/manager file=dir full=y(owner=username)
+
+--删除空间
+drop tablespace '空间名' including contents and datafiles;
+
+--创建空间
+create tablespace '空间名' 
+datafile '/oracle/oradata/CZCESMSDB/CZCESMSDB.dbf' size 1000m autoextend on next 100m maxsize unlimited;
+
+--创建用户  
+create user '用户名' identified by '密码' default tablespace '空间名'; 
+
+--赋予权限
+grant dba,connect,resource to '用户名';
 
 /*
  生成执行计划：
