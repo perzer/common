@@ -29,6 +29,7 @@ import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.NoHttpResponseException;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
@@ -1513,6 +1514,31 @@ public class QDOperate {
 				return h.getValue();
 		}
 		return null;
+	}
+	
+	/**
+	 * 解析起点短网址
+	 * @param url
+	 * @return
+	 */
+	public String parseShortUrl(String url) {
+		if (url.contains("u.qidian.com")) {
+			HttpGet get = null;
+			HttpPost post = null;
+			HttpResponse response = null;
+			//为短网址，需要进行POST请求，得到Headers中的Location
+			post = new HttpPost(url.trim());
+			try {
+				response = httpclient.execute(post);
+			} catch (ClientProtocolException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			post.abort();
+			url = getHeaderInfo(response.getAllHeaders(), "Location");
+		}
+		return url;
 	}
 
 	/**
