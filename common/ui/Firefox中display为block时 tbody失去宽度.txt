@@ -1,0 +1,6 @@
+用 JavaScript 动态设置一个表格的显示和隐藏，先是直接设置此 table 的 display 为 block，发现整个表格宽度仍维持正常，但各表格行的边框线不能撑满了。
+
+原因是当 table 的 display 为 block 时，不论是否在 HTML 里显式地写了 tbody 标签，Firefox 解析出的 tbody 都不再和 table 等宽，而是适应表格行的宽度。
+解决办法：
+1.要使 tbody 宽度正常，必须设置 display:table。
+2.设置：    elem.style.display = '';  
