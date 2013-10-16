@@ -123,88 +123,29 @@ create user '用户名' identified by '密码' default tablespace '空间名';
 --赋予权限
 grant dba,connect,resource to '用户名';
 
-/*
- 生成执行计划：
- 1.set autotrace on
- 这个语句的优点就是它的缺点，这样在用该方法查看执行时间较长的sql语句时，需要等待该语句执行成功后，才返回执行计划，使优化的周期大大增长。
- 2.set autotrace traceonly
- 这样还是会执行语句。它比set autotrace on的优点是：不会显示出查询的数据，但是还是会将数据输出到客户端，这样当语句查询的数据比较多时，
- 语句执行将会花费大量的时间，因为很大部分时间用在将数据从数据库传到客户端上了。
- 3.set autotrace traceonly explain
- 如同用explain plan命令。对于select 语句，不会执行select语句，而只是产生执行计划。但是对于dml语句，还是会执行语句，不同版本的数据
- 库可能会有小的差别。这样在优化执行时间较长的select语句时，大大减少了优化时间，解决了 “set autotrace on”与“set autotrace traceonly”
- 命令优化时执行时间长的问题，但同时带来的问题是：不会产生Statistics数据，而通过Statistics数据的物理I/O的次数，我们可以简单的判断语句执行效率的优劣。
- 
- 执行上述语句报错时：在要分析的用户下：
- SQL> @ ?/rdbms/admin/utlxplan.sql
- SQL> @ ?/sqlplus/admin/plustrce.sql
- SQL> grant plustrace to username;
-设置sqlplus显示宽度：set linesize 100;
-记录输出到文件：spool filename
-		   select * from xxx;
-		   spool off;
- 
- 干预执行计划，hints提示
- 指示优化器的方法和目标的hints：
- ALL_ROWS --基于代价的优化器，以吞吐量为目标
- FIRST_ROWS(n) --基于代价的优化器，以响应时间为目标
- CHOOST --根据是否有统计信息，选择不同的优化器
- RULE --使用基于规则的优化器
- 
- 例子：
- 	SELECT /*+ FIRST_ROWS(10) */ employee_id, last_name, salary, job_id
-	FROM employees
-	WHERE department_id = 20;
-	
-	SELECT /*+ CHOOSE */ employee_id, last_name, salary, job_id
-	FROM employees
-	WHERE employee_id = 7566;
-	
-	SELECT /*+ RULE */ employee_id, last_name, salary, job_id
-	FROM employees
-	WHERE employee_id = 7566;
-	
- 指示存储路径的hints:
- FULL /*+ FULL(table) */  指定该表使用全表扫描
- ROWID /*+ ROWID(table) */ 指定对该表使用rowid存取方法，不常用
- INDEX /*+ (table [index]) */ 使用该表上指定的索引对表进行扫描
- INDEX_FFS /*+ INDEX_FFS(table [index]) */ 使用快速索引扫描
- NO_INDEX /*+ NO_INDEX(table [index]) */ 不使用该表上的指定索引进行存取，仍然可以使用其他的索引进行索引扫描
- 
- 例子：
- 	SELECT /*+ FULL(e) */ employee_id, last_name
-	FROM employees e
-	WHERE last_name LIKE :b1;
-	
-	SELECT /*+ROWID(employees)*/ *
-	FROM employees
-	WHERE rowid > 'AAAAtkAABAAAFNTAAA' AND employee_id = 155;
-	
-	SELECT /*+ INDEX(A sex_index) use sex_index because there are few
-	male patients */ A.name, A.height, A.weight
-	FROM patients A
-	WHERE A.sex = ’m’;
-	
-	SELECT /*+NO_INDEX(employees emp_empid)*/ employee_id
-	FROM employees
-	WHERE employee_id > 200;
 
- 指示连接顺序的hints:
- ORDERED /*+ ORDERED */ 按from字句中表的顺序从左到右的连接
- STAR /*+ STAR */ 指示优化器使用星型查询
- 
- 例子：
-	SELECT /*+ORDERED */ o.order_id, c.customer_id, l.unit_price * l.quantity
-	FROM customers c, order_items l, orders o
-	WHERE c.cust_last_name = :b1
-	AND o.customer_id = c.customer_id
-	AND o.order_id = l.order_id;
-	        
-	/*+ ORDERED USE_NL(FACTS) INDEX(facts fact_concat) */
- 指示连接类型的hints:
- USE_NL /*+ USE_NL(table [,table,table……]) */使用嵌套连接
- USE_MERAGE /*+ USE_MERAGE(table [,table,……) */ 使用排序--合并连接
- USE_HASH /*+ USE_HASH(table [,table,……) */ 使用HASH连接
- 注意：如果表有alias(别名)，则上面的table是表的别名，而不是真实的表名
- 
- */
+--恢复表数据
+--分为两种方法：scn和时间戳两种方法恢复。
+--一、通过scn恢复删除且已提交的数据
+　　--1、获得当前数据库的scn号
+　　　　select current_scn from v$database; --(切换到sys用户或system用户查询) 
+　　　　--查询到的scn号为：1499223
+
+　　--2、查询当前scn号之前的scn
+　　　　select * from tablename as of scn 1499220; --(确定删除的数据是否存在，如果存在，则恢复数据；如果不是，则继续缩小scn号)
+
+　　--3、恢复删除且已提交的数据
+　　　　flashback table 表名 to scn 1499220;
+
+--二、通过时间恢复删除且已提交的数据
+　　--1、查询当前系统时间
+　　　　select to_char(sysdate,'yyyy-mm-dd hh24:mi:ss') from dual;
+
+　　--2、查询删除数据的时间点的数据
+　　　　select * from tablename as of timestamp to_timestamp('2013-05-29 15:29:00','yyyy-mm-dd hh24:mi:ss');  --(如果不是，则继续缩小范围)
+
+　　--3、打开Flash存储的权限
+	 alter table tablename enable row movement ;
+	 
+　　--4、恢复删除且已提交的数据
+　　　　flashback table 表名 to timestamp to_timestamp('2013-05-29 15:29:00','yyyy-mm-dd hh24:mi:ss');
