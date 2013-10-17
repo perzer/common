@@ -1,0 +1,3 @@
+<Connector port="8081" maxHttpHeaderSize="8192" maxThreads="1000" minSpareThreads="100" maxSpareThreads="300"
+	enableLookups="false" redirectPort="8443" acceptCount="1024" connectionTimeout="30000" disableUploadTimeout="true"
+	compression="on" compressionMinSize="2048" noCompressionUserAgents="gozilla, traviata" compressableMimeType="text/html,text/xml" />
