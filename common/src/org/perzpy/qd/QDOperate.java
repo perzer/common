@@ -48,8 +48,9 @@ import org.apache.log4j.Logger;
 
 /**
  * 模拟QD部分动作
+ * 
  * @date Sep 17, 2011
- *
+ * 
  */
 public class QDOperate {
 	//一些提交URL、Referer URL
@@ -67,7 +68,7 @@ public class QDOperate {
 	private static final String CHECKIN_REFERER = "http://www.qidian.com/Pop/ShowBook/BookCheckIn.aspx?bookId={0}&mt=0&ds=1&ut=1&rand=1286923359";
 	private static final String SANJIANG_URL = "http://sjg.qidian.com/Ajax.aspx?opName=qd.p.up.sjgvote";
 	private static final String SANJIANG_REFERER = "http://sjg.qidian.com/Default.aspx";
-	private static final String REWARD_URL = "http://forum.qidian.com/BookForumNew2.aspx?bookId={0}&postType=41";
+	private static final String REWARD_URL = "http://forum.qidian.com/NewForum/List.aspx?bookId={0}&postType=41";
 	private static final String IMPRESSION_URL = "http://www.qidian.com/AjaxCom.aspx?opName=pub.p.up.submitreaderlabel";
 	private static final String IMPRESSION_REFERER = "http://www.qidian.com/pop/showbook/ReaderLabel.aspx?BookId={0}&mt=1&ds=1&ut=1&categoryId=4&rand=2193865587";
 	private static final String NOW_GH_URL = "http://me.qidian.com/comment/friendComment.aspx?userId=2466610";
@@ -75,20 +76,27 @@ public class QDOperate {
 	private static final String TWITTER_URL = "http://me.qidian.com/Ajax/Twitter.ashx";
 	private static final String TWITTER_REFERER = "http://me.qidian.com/";
 	private static final String ADD_CHAPTER_URL = "http://author.qidian.com/BookMan/AddChapter.aspx?authorBookId={0}&authorBookName={1}";
-	private static final String RELEASE_REWARD_REFERER = "http://forum.qidian.com/Manage/PostManage.aspx?fid={0}&tid={1}";
-	private static final String RELEASE_REWARD_URL = "http://forum.qidian.com/ForumAjax.aspx?opName=ShangHandler";
+	private static final String RELEASE_REWARD_REFERER_OLD = "http://forum.qidian.com/Manage/PostManage.aspx?fid={0}&tid={1}";
+	private static final String RELEASE_REWARD_REFERER = "http://forum.qidian.com/NewForum/Detail.aspx?threadid={0}";
+	private static final String RELEASE_REWARD_URL_OLD = "http://forum.qidian.com/ForumAjax.aspx?opName=ShangHandler";
+	private static final String RELEASE_REWARD_URL = "http://forum.qidian.com/ForumAjax.aspx?opName=ShangHandlerNew";
 	private static final String ADD_TOPIC_URL = "http://me.qidian.com/Ajax/NewTopic.ashx";
 	private static final String FORUM_URL = "http://forum.qidian.com/BookForumNew.aspx?bookId={0}";
 	private static final String RELEASE_SCORE_REFERER = "http://forum.qidian.com/Manage/ForumManage.aspx?forumId={0}";
 	private static final String RELEASE_SCORE_URL = "http://forum.qidian.com/ForumAjax.aspx?opName=AddScoreByAdmin";
-	private static final String FORUM_HOME_URL = "http://forum.qidian.com/Manage/ForumManage.aspx?forumId={0}";
+	private static final String FORUM_HOME_URL_OLD = "http://forum.qidian.com/Manage/ForumManage.aspx?forumId={0}";
+	private static final String FORUM_HOME_URL = "http://forum.qidian.com/NewForum/List.aspx?bookId={0}";
+	private static final String FORUM_DEL_URL = "http://forum.qidian.com/ForumAjax.aspx?opName=pub.p.up.threaddelete";
+	private static final String FORUM_DEL_REFERER = "http://forum.qidian.com/NewForum/Pop/DeleteThread.aspx?isgood=false&forumid={0}&threadid={1}&reviewtitle=dd";
+	private static final String FORUM_RELEASE_URL = "http://forum.qidian.com/ForumAjax.aspx?opName=pub.p.up.addscorebyadminnew";
+	private static final String FORUM_RELEASE_REFERER = "http://forum.qidian.com/NewForum/Pop/Jiang.aspx?forumid={0}&threadid={1}&operationobj={2}&userid=3831365&threadname=d";
 	private static final String AUTHOR_DEL_CHAPTER_REFERER = "http://author.qidian.com/BookMan/ChapterVolumeMan.aspx?authorBookId={0}&authorBookName={1}";
 	private static final String GET_CHAPTERID_URL = "http://author.qidian.com/Ajax/BookMan.ashx";
-    private static final String GET_OLD_EXP_URL = "http://me.qidian.com/Ajax/Occupation.ashx?ajaxMethod=getoldexp&random={0}";
-    private static final String MY_PET_URL = "http://me.qidian.com/pet/myPet.aspx";
-    private static final String ACTIVITY_HOME_URL = "http://me.qidian.com/profile/activity.aspx";
-    private static final String ACTIVITY_HOME_EXECUTE = "http://me.qidian.com/Ajax/Missions.ashx?ajaxMethod=getfinishdaymissionnum";
-    private static final String FRIEND_HOME_URL = "http://me.qidian.com/friendIndex.aspx?id={0}";
+	private static final String GET_OLD_EXP_URL = "http://me.qidian.com/Ajax/Occupation.ashx?ajaxMethod=getoldexp&random={0}";
+	private static final String MY_PET_URL = "http://me.qidian.com/pet/myPet.aspx";
+	private static final String ACTIVITY_HOME_URL = "http://me.qidian.com/profile/activity.aspx";
+	private static final String ACTIVITY_HOME_EXECUTE = "http://me.qidian.com/Ajax/Missions.ashx?ajaxMethod=getfinishdaymissionnum";
+	private static final String FRIEND_HOME_URL = "http://me.qidian.com/friendIndex.aspx?id={0}";
 	private static final Logger log = Logger.getLogger(QDOperate.class);
 	private DefaultHttpClient httpclient = new DefaultHttpClient();
 	private List<NameValuePair> formparams;
@@ -99,7 +107,8 @@ public class QDOperate {
 	private static HttpRequestRetryHandler requestRetryHandler = new HttpRequestRetryHandler() {
 		// 自定义的恢复策略
 		@Override
-		public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
+		public boolean retryRequest(IOException exception, int executionCount,
+				HttpContext context) {
 			// 设置恢复策略，在发生异常时候将自动重试3次
 			if (executionCount >= 3) {
 				// Do not retry if over max retry count
@@ -113,7 +122,8 @@ public class QDOperate {
 				// Do not retry on SSL handshake exception
 				return false;
 			}
-			HttpRequest request = (HttpRequest) context.getAttribute(ExecutionContext.HTTP_REQUEST);
+			HttpRequest request = (HttpRequest) context
+					.getAttribute(ExecutionContext.HTTP_REQUEST);
 			boolean idempotent = (request instanceof HttpEntityEnclosingRequest);
 			if (!idempotent) {
 				// Retry if the request is considered idempotent
@@ -152,17 +162,20 @@ public class QDOperate {
 
 	/**
 	 * 模拟登录
+	 * 
 	 * @param username
 	 * @param password
 	 * @return
 	 * @throws Exception
 	 */
-	public void login(String username, String password, boolean isUseProxy) throws Exception {
+	public void login(String username, String password, boolean isUseProxy)
+			throws Exception {
 		setHttpclient();
-		log.info(username + " 正在登录……" );
+		log.info(username + " 正在登录……");
 		//设置代理
 		if (isUseProxy) {
-			httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, getHttpHost());
+			httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,
+					getHttpHost());
 		}
 		StringBuilder loginUrl = new StringBuilder();
 		loginUrl.append(LOGIN_URL);
@@ -173,7 +186,13 @@ public class QDOperate {
 		HttpResponse response = httpclient.execute(get);
 		String result = EntityUtils.toString(response.getEntity(), "gb2312");
 		get.abort();
-		get = new HttpGet(result.substring(result.indexOf("http"), result.indexOf("\";")));
+		if (result.indexOf("CAPTCHA") > -1) {
+			String codeUrl = result.substring(result.indexOf("http:"), result.lastIndexOf("\";"));
+			log.info("验证码地址：" + codeUrl);
+			throw new Exception("登录失败！");
+		}
+		get = new HttpGet(result.substring(result.indexOf("http"),
+				result.indexOf("\";")));
 		response = httpclient.execute(get);
 		get.abort();
 		get = new HttpGet("http://me.qidian.com/Index.aspx");
@@ -188,6 +207,7 @@ public class QDOperate {
 
 	/**
 	 * 回复主题
+	 * 
 	 * @param threadUrl 主题URL
 	 * @param content 回复内容
 	 * @param isLow 是否是低于500分的帐号
@@ -230,29 +250,34 @@ public class QDOperate {
 			}
 			//如果地址中含有#XXX的，则为锚记，必须去掉后作为请求地址
 			if (threadUrl.contains("#newPost")) {
-				threadUrl = threadUrl.substring(0, threadUrl.lastIndexOf("#newPost"));
+				threadUrl = threadUrl.substring(0,
+						threadUrl.lastIndexOf("#newPost"));
 			}
 			get = new HttpGet(threadUrl.trim());
 			response = httpclient.execute(get);
 			result = EntityUtils.toString(response.getEntity(), "gb2312");
 			//从result中读出指定帖子的ID以及书评区ID
-			if (!result.contains("var curThreadId = \"")) {
+			if (!result.contains("postUtil.forumId")) {
 				log.error(threadUrl + " 没有找到书评区信息！");
 				return -1;
 			}
-			String curForumId = result.substring(result.indexOf("curForumId = \"") + 14,
-					result.indexOf("var curThreadId = \"") - 4);
+			String curForumId = result.substring(
+					result.indexOf("postUtil.forumId = ") + 19,
+					result.indexOf("postUtil.threadId") - 4);
 			String curThreadId = null;
 
-			/*if (threadUrl.contains("qidian")) {
-				curThreadId = result.substring(result.indexOf("curThreadId = \"") + 15,
-						result.indexOf("var curReviewId;") - 4);
-			} else {
-				curThreadId = result.substring(result.indexOf("curThreadId = \"") + 15,
-						result.indexOf("var curReviewId;") - 6);
-			}*/
+			/*
+			 * if (threadUrl.contains("qidian")) {
+			 * curThreadId = result.substring(result.indexOf("curThreadId = \"") + 15,
+			 * result.indexOf("var curReviewId;") - 4);
+			 * } else {
+			 * curThreadId = result.substring(result.indexOf("curThreadId = \"") + 15,
+			 * result.indexOf("var curReviewId;") - 6);
+			 * }
+			 */
 			if (threadUrl.contains("?threadid=")) {
-				curThreadId = threadUrl.substring(threadUrl.indexOf("?threadid=") + 10);
+				curThreadId = threadUrl.substring(threadUrl
+						.indexOf("?threadid=") + 10);
 			} else {
 				log.info(threadUrl + "回帖地址出错，回帖失败！");
 			}
@@ -291,7 +316,8 @@ public class QDOperate {
 		if (result.contains("成功")) {
 			log.info(result);
 			if (result.contains("获取")) {
-				return Double.parseDouble(result.substring(result.indexOf("获取") + 2, result.lastIndexOf("个")));
+				return Double.parseDouble(result.substring(
+						result.indexOf("获取") + 2, result.lastIndexOf("个")));
 			}
 			return 0;
 		}
@@ -307,14 +333,16 @@ public class QDOperate {
 
 	/**
 	 * 批量回复主题
+	 * 
 	 * @param content 回复内容
 	 * @param isLow 帐号是否低于500积分
 	 * @param filepath 文件路径
-	 * 			其中文件要求如下，一行放一个主题URL
+	 *            其中文件要求如下，一行放一个主题URL
 	 * @return 得到评论积分
 	 * @throws Exception
 	 */
-	public double batchReplyByFile(String content, boolean isLow, String filepath) throws Exception {
+	public double batchReplyByFile(String content, boolean isLow,
+			String filepath) throws Exception {
 		File file = new File(filepath);
 		if (!file.exists()) {
 			throw new Exception("批量回复文件不存在，请检查文件路径是否正确！");
@@ -344,6 +372,7 @@ public class QDOperate {
 
 	/**
 	 * 自动得到恭贺帖地址并回复
+	 * 
 	 * @param content
 	 * @param isLow
 	 * @return
@@ -360,15 +389,19 @@ public class QDOperate {
 			return -1;
 		}
 		response = httpclient.execute(new HttpGet(nowGHUrl));
-		String[] result = EntityUtils.toString(response.getEntity()).split("\n");
+		String[] result = EntityUtils.toString(response.getEntity())
+				.split("\n");
 		for (String data : result) {
 			if (data.contains("http://u.qidian.com")) {
-				String[] allUrl = data.split("<a\\shref=\"http://u[.]qidian[.]com/.{6}\"\\stitle=\"");
+				String[] allUrl = data
+						.split("<a\\shref=\"http://u[.]qidian[.]com/.{6}\"\\stitle=\"");
 				for (String value : allUrl) {
 					if (value.indexOf("\" target") != -1) {
 						total += 1;
 						log.info(total);
-						double tmp = replyThread(value.substring(0, value.indexOf("\" target")), content, isLow);
+						double tmp = replyThread(
+								value.substring(0, value.indexOf("\" target")),
+								content, isLow);
 						if (tmp != -1) {
 							succ += 1;
 							score += tmp;
@@ -385,11 +418,13 @@ public class QDOperate {
 
 	/**
 	 * 发表主题
+	 * 
 	 * @param bid 书评区ID
 	 * @param title 主题标题
 	 * @param content 主题内容
 	 */
-	public void postThread(String bid, String title, String content) throws Exception {
+	public void postThread(String bid, String title, String content)
+			throws Exception {
 		HttpPost post = null;
 		HttpResponse response = null;
 		log.info("BID: " + bid);
@@ -421,6 +456,7 @@ public class QDOperate {
 
 	/**
 	 * 投推荐票
+	 * 
 	 * @param bid 书籍ID
 	 * @param num 票数
 	 */
@@ -440,7 +476,8 @@ public class QDOperate {
 			post.setEntity(new UrlEncodedFormEntity(formparams, "UTF-8"));
 
 			//设置请求Headers中的Referer
-			post.setHeader("Referer", MessageFormat.format(VOTEBOOK_REFERER, bid));
+			post.setHeader("Referer",
+					MessageFormat.format(VOTEBOOK_REFERER, bid));
 			response = httpclient.execute(post);
 			log.info(EntityUtils.toString(response.getEntity()));
 		} catch (Exception e) {
@@ -450,6 +487,7 @@ public class QDOperate {
 
 	/**
 	 * 领取个人礼包
+	 * 
 	 * @throws Exception
 	 */
 	public void getGift() throws Exception {
@@ -467,9 +505,12 @@ public class QDOperate {
 			}
 
 			log.info("个人礼包："
-					+ result.substring(result.indexOf("经验值 <em>+"), result.indexOf("经验值 <em>+") + 11).replace("<em>",
-							"") + "，"
-					+ result.substring(result.indexOf("钻石 <em>+"), result.indexOf("钻石 <em>+") + 9).replace("<em>", ""));
+					+ result.substring(result.indexOf("经验值 <em>+"),
+							result.indexOf("经验值 <em>+") + 11).replace("<em>",
+							"")
+					+ "，"
+					+ result.substring(result.indexOf("钻石 <em>+"),
+							result.indexOf("钻石 <em>+") + 9).replace("<em>", ""));
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
 		}
@@ -477,6 +518,7 @@ public class QDOperate {
 
 	/**
 	 * 论坛打卡
+	 * 
 	 * @throws Exception
 	 */
 	public void sign() throws Exception {
@@ -502,6 +544,7 @@ public class QDOperate {
 
 	/**
 	 * 书籍签到
+	 * 
 	 * @param bids 单个或书籍数组
 	 * @throws Exception
 	 */
@@ -517,11 +560,13 @@ public class QDOperate {
 				addPostParameter("comment", "在这里签到一下，分享感想给书友");
 				addPostParameter("bookname", bids[i]);
 				addPostParameter("bookid", bids[i]);
-				addPostParameter("pageUrl", "http://www.qidian.com/Book/" + bids[i] + ".aspx");
+				addPostParameter("pageUrl", "http://www.qidian.com/Book/"
+						+ bids[i] + ".aspx");
 
 				post = new HttpPost(CHECKIN_URL);
 				post.setEntity(new UrlEncodedFormEntity(formparams, "UTF-8"));
-				post.setHeader("Referer", MessageFormat.format(CHECKIN_REFERER, bids[0]));
+				post.setHeader("Referer",
+						MessageFormat.format(CHECKIN_REFERER, bids[0]));
 				response = httpclient.execute(post);
 				log.info(EntityUtils.toString(response.getEntity()));
 			}
@@ -532,6 +577,7 @@ public class QDOperate {
 
 	/**
 	 * 投三江票
+	 * 
 	 * @param bid 书号
 	 * @throws Exception
 	 */
@@ -556,14 +602,16 @@ public class QDOperate {
 
 	/**
 	 * 抢悬赏
+	 * 
 	 * @param bid 书号
 	 * @param content 内容
 	 * @param time 间隔时间
-	 * @param username 
+	 * @param username
 	 * @param password
 	 * @throws Exception
 	 */
-	public void getReward(String bid, String content, long time, String username, String password) throws Exception {
+	public void getReward(String bid, String content, long time,
+			String username, String password) throws Exception {
 		login(username, password, false);
 		HttpResponse response = null;
 		String[] result = null;
@@ -574,21 +622,30 @@ public class QDOperate {
 
 		try {
 			while (true) {
-				response = httpclient.execute(new HttpGet(MessageFormat.format(REWARD_URL, bid)));
+				response = httpclient.execute(new HttpGet(MessageFormat.format(
+						REWARD_URL, bid)));
 				result = EntityUtils.toString(response.getEntity()).split("\n");
 				for (int i = 0; i < result.length; i++) {
 					if (isBlank(result[i]))
 						continue;
 					//找到最新悬赏回复数
-					if (result[i].indexOf("<td align=\"left\" style=\"padding-left:15px;\">") != -1 && !isFindReply) {
-						replyNum = result[i].replace("<td align=\"left\" style=\"padding-left:15px;\">", "")
-								.replace("</td>", "").replaceAll(".*/", "").trim();
+					if (result[i]
+							.indexOf("<td align=\"left\" style=\"padding-left:15px;\">") != -1
+							&& !isFindReply) {
+						replyNum = result[i]
+								.replace(
+										"<td align=\"left\" style=\"padding-left:15px;\">",
+										"").replace("</td>", "")
+								.replaceAll(".*/", "").trim();
 						isFindReply = true;
 					}
 					//找到最新悬赏地址
-					if (result[i].indexOf("<a target=\"_blank\" href='") != -1 && !isFindUrl) {
-						threadUrl = result[i].replace("<a target=\"_blank\" href='", "")
-								.replaceAll("'\\sstyle='font-size:14px;.*", "").trim();
+					if (result[i].indexOf("<a target=\"_blank\" href='") != -1
+							&& !isFindUrl) {
+						threadUrl = result[i]
+								.replace("<a target=\"_blank\" href='", "")
+								.replaceAll("'\\sstyle='font-size:14px;.*", "")
+								.trim();
 						isFindUrl = true;
 					}
 					//如果全部找到，则跳出循环
@@ -605,7 +662,8 @@ public class QDOperate {
 					replyThread(threadUrl, content, false);
 					replyNum = threadUrl = "";
 				}
-				if (time > 0) Thread.sleep(time);
+				if (time > 0)
+					Thread.sleep(time);
 			}
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
@@ -614,6 +672,7 @@ public class QDOperate {
 
 	/**
 	 * 添加读者印象
+	 * 
 	 * @param bid 书号
 	 * @param newLabel 印象
 	 * @throws Exception
@@ -629,7 +688,8 @@ public class QDOperate {
 		try {
 			post = new HttpPost(IMPRESSION_URL);
 			post.setEntity(new UrlEncodedFormEntity(formparams, "UTF-8"));
-			post.setHeader("Referer", MessageFormat.format(IMPRESSION_REFERER, bid));
+			post.setHeader("Referer",
+					MessageFormat.format(IMPRESSION_REFERER, bid));
 			response = httpclient.execute(post);
 			log.info(EntityUtils.toString(response.getEntity()));
 		} catch (Exception e) {
@@ -639,6 +699,7 @@ public class QDOperate {
 
 	/**
 	 * 得到最新恭贺帖地址
+	 * 
 	 * @return
 	 * @throws Exception
 	 */
@@ -647,14 +708,17 @@ public class QDOperate {
 		boolean isFind = false;
 		try {
 			HttpResponse response = httpclient.execute(new HttpGet(ghURL));
-			String[] result = EntityUtils.toString(response.getEntity()).split("\n");
+			String[] result = EntityUtils.toString(response.getEntity()).split(
+					"\n");
 			Calendar cal = Calendar.getInstance();
 			cal.add(Calendar.DAY_OF_MONTH, -1);
-			String nowDate = (new SimpleDateFormat("M.d")).format(cal.getTime());
+			String nowDate = (new SimpleDateFormat("M.d"))
+					.format(cal.getTime());
 			for (String data : result) {
 				if (data.contains(nowDate)) {
 					isFind = true;
-					url = data.substring(data.indexOf("href=\"") + 6, data.indexOf("\" target"));
+					url = data.substring(data.indexOf("href=\"") + 6,
+							data.indexOf("\" target"));
 					log.info(nowDate + "最新恭贺帖地址：" + url);
 					break;
 				}
@@ -673,6 +737,7 @@ public class QDOperate {
 
 	/**
 	 * 发送twitter
+	 * 
 	 * @param content 发送内容
 	 * @throws Exception
 	 */
@@ -695,14 +760,14 @@ public class QDOperate {
 			throw new Exception(e.getMessage());
 		}
 	}
-	
+
 	public void addTopic() throws Exception {
 		HttpPost post = null;
 		HttpResponse response = null;
 
 		formparams = new ArrayList<NameValuePair>();
 		addPostParameter("ajaxMethod", "AddTopic");
-		addPostParameter("title", "冒牌书友会" +  (int)(Math.random() * 100));
+		addPostParameter("title", "冒牌书友会" + (int) (Math.random() * 100));
 		addPostParameter("content", "人人推荐。");
 
 		try {
@@ -717,10 +782,12 @@ public class QDOperate {
 
 	/**
 	 * 登录作者专区
+	 * 
 	 * @throws Exception
 	 */
 	public void loginAuthorArea() throws Exception {
-		HttpGet get = new HttpGet("http://me.qidian.com/author/authorLogin.aspx");
+		HttpGet get = new HttpGet(
+				"http://me.qidian.com/author/authorLogin.aspx");
 		try {
 			httpclient.execute(get);
 			get.abort();
@@ -731,12 +798,14 @@ public class QDOperate {
 
 	/**
 	 * 发布新章节
+	 * 
 	 * @param bid 书号
 	 * @param bookName 书名
 	 * @param chapterIndex 更新章节数
 	 * @throws Exception
 	 */
-	public void addChapter(String bid, String bookName, String chapterIndex) throws Exception {
+	public void addChapter(String bid, String bookName, String chapterIndex)
+			throws Exception {
 		HttpPost post = null;
 		HttpResponse response = null;
 		String viewstate = "";
@@ -744,63 +813,90 @@ public class QDOperate {
 		String bookVolume = "";
 
 		try {
-			response = httpclient.execute(new HttpGet(MessageFormat.format(ADD_CHAPTER_URL, bid, bookName)));
-			String[] result = EntityUtils.toString(response.getEntity()).split("\n");
+			response = httpclient.execute(new HttpGet(MessageFormat.format(
+					ADD_CHAPTER_URL, bid, bookName)));
+			String[] result = EntityUtils.toString(response.getEntity()).split(
+					"\n");
 			for (String data : result) {
 				if (data.contains("__VIEWSTATE")) {
-					viewstate = data.substring(data.indexOf("value=\"") + 7, data.lastIndexOf("\" />"));
+					viewstate = data.substring(data.indexOf("value=\"") + 7,
+							data.lastIndexOf("\" />"));
 				}
 
 				if (data.contains("__EVENTVALIDATION")) {
-					eventvalidation = data.substring(data.indexOf("value=\"") + 7, data.lastIndexOf("\" />"));
-				}
-				
-				if (data.contains("正文")) {
-					bookVolume = data.substring(data.indexOf("value=\"") + 7, data.lastIndexOf("\">"));
+					eventvalidation = data.substring(
+							data.indexOf("value=\"") + 7,
+							data.lastIndexOf("\" />"));
 				}
 
-				if (!isBlank(viewstate) && !isBlank(eventvalidation) && !isBlank(bookVolume)) {
+				if (data.contains("正文")) {
+					bookVolume = data.substring(data.indexOf("value=\"") + 7,
+							data.lastIndexOf("\">"));
+				}
+
+				if (!isBlank(viewstate) && !isBlank(eventvalidation)
+						&& !isBlank(bookVolume)) {
 					break;
 				}
 			}
 
 			//构造multipart/form-data数据
 			MultipartEntity entity = new MultipartEntity();
-			entity.addPart("__EVENTTARGET", new StringBody("", Charset.forName("UTF-8")));
-			entity.addPart("__EVENTARGUMENT", new StringBody("", Charset.forName("UTF-8")));
-			entity.addPart("__VIEWSTATE", new StringBody(viewstate, Charset.forName("UTF-8")));
-			entity.addPart("__EVENTVALIDATION", new StringBody(eventvalidation, Charset.forName("UTF-8")));
+			entity.addPart("__EVENTTARGET",
+					new StringBody("", Charset.forName("UTF-8")));
+			entity.addPart("__EVENTARGUMENT",
+					new StringBody("", Charset.forName("UTF-8")));
+			entity.addPart("__VIEWSTATE",
+					new StringBody(viewstate, Charset.forName("UTF-8")));
+			entity.addPart("__EVENTVALIDATION", new StringBody(eventvalidation,
+					Charset.forName("UTF-8")));
 			entity.addPart("ctl00$ContentPlaceHolder1$ddlBookVolume",
 					new StringBody(bookVolume, Charset.forName("UTF-8")));
 			entity.addPart("ctl00$ContentPlaceHolder1$hddVolumeId",
 					new StringBody(bookVolume, Charset.forName("UTF-8")));
-			entity.addPart("ctl00$ContentPlaceHolder1$hddVolumeName", new StringBody("正文", Charset.forName("UTF-8")));
-			entity.addPart("ctl00$ContentPlaceHolder1$txtChapterName",
-					new StringBody("第" + chapterIndex + "章", Charset.forName("UTF-8")));
-			entity.addPart("ctl00$ContentPlaceHolder1$h_chapterimgtype", new StringBody("2", Charset.forName("UTF-8")));
-			entity.addPart("ctl00$ContentPlaceHolder1$txtChapterImgUrl", new StringBody("", Charset.forName("UTF-8")));
-			entity.addPart("ctl00$ContentPlaceHolder1$txtChapterContent", new StringBody(new SimpleDateFormat(
-					"yyyy.MM.dd 日记").format(new Date()) + chapterIndex, Charset.forName("UTF-8")));
+			entity.addPart("ctl00$ContentPlaceHolder1$hddVolumeName",
+					new StringBody("正文", Charset.forName("UTF-8")));
+			entity.addPart(
+					"ctl00$ContentPlaceHolder1$txtChapterName",
+					new StringBody("第" + chapterIndex + "章", Charset
+							.forName("UTF-8")));
+			entity.addPart("ctl00$ContentPlaceHolder1$h_chapterimgtype",
+					new StringBody("2", Charset.forName("UTF-8")));
+			entity.addPart("ctl00$ContentPlaceHolder1$txtChapterImgUrl",
+					new StringBody("", Charset.forName("UTF-8")));
+			entity.addPart(
+					"ctl00$ContentPlaceHolder1$txtChapterContent",
+					new StringBody(new SimpleDateFormat("yyyy.MM.dd 日记")
+							.format(new Date()) + chapterIndex, Charset
+							.forName("UTF-8")));
 			entity.addPart("ctl00$ContentPlaceHolder1$btnSubmit",
 					new StringBody("确认无误，上传新章节", Charset.forName("UTF-8")));
 
 			//此处无附件时，参数必须要，所以新建一个文件
 			if (!new File("1.jpg").exists()) {
-				BufferedWriter writer = new BufferedWriter(new FileWriter("1.jpg"));
+				BufferedWriter writer = new BufferedWriter(new FileWriter(
+						"1.jpg"));
 				writer.append("111");
 				writer.flush();
 				writer.close();
 			}
-			entity.addPart("ctl00$ContentPlaceHolder1$imgChapterImg", new FileBody(new File("1.jpg")));
+			entity.addPart("ctl00$ContentPlaceHolder1$imgChapterImg",
+					new FileBody(new File("1.jpg")));
 
-			post = new HttpPost(MessageFormat.format(ADD_CHAPTER_URL, bid, bookName));
+			post = new HttpPost(MessageFormat.format(ADD_CHAPTER_URL, bid,
+					bookName));
 			post.setEntity(entity);
-			post.setHeader("Referer", URLEncoder.encode(MessageFormat.format(ADD_CHAPTER_URL, bid, bookName), "UTF-8"));
+			post.setHeader("Referer", URLEncoder.encode(
+					MessageFormat.format(ADD_CHAPTER_URL, bid, bookName),
+					"UTF-8"));
 			response = httpclient.execute(post);
-			String location = getHeaderInfo(response.getAllHeaders(), "Location");
+			String location = getHeaderInfo(response.getAllHeaders(),
+					"Location");
 			post.abort();
 			if (!isBlank(location)
-					&& URLDecoder.decode(location.substring(location.indexOf("ret=") + 4), "UTF-8").contains("成功")) {
+					&& URLDecoder.decode(
+							location.substring(location.indexOf("ret=") + 4),
+							"UTF-8").contains("成功")) {
 				log.info("章节发布成功");
 			} else {
 				log.info("章节发布失败");
@@ -812,6 +908,7 @@ public class QDOperate {
 
 	/**
 	 * 回复所有回复为0的悬赏帖
+	 * 
 	 * @param bid 书号
 	 */
 	public List<String> replyAllZeroReward(String bid) throws Exception {
@@ -823,39 +920,34 @@ public class QDOperate {
 		List<String> threadIds = new ArrayList<String>();
 
 		try {
-			response = httpclient.execute(new HttpGet(MessageFormat.format(REWARD_URL, bid)));
+			response = httpclient.execute(new HttpGet(MessageFormat.format(
+					REWARD_URL, bid)));
 			result = EntityUtils.toString(response.getEntity()).split("\n");
 			//找到所有回复为0的悬赏帖的地址
 			for (int i = 0; i < result.length; i++) {
-				if (isBlank(result[i]))
+				if (isBlank(result[i].trim()))
 					continue;
-				//找到最新悬赏地址
-				if (result[i].indexOf("<a target=\"_blank\" href='") != -1) {
-					threadUrl = result[i].replace("<a target=\"_blank\" href='", "")
-							.replaceAll("'\\sstyle='font-size:14px;.*", "").trim();
-				}
-
 				//找到最新悬赏回复数
-				if (result[i].indexOf("<td align=\"left\" style=\"padding-left:15px;\">") != -1) {
-					replyNum = result[i]
-							.replaceAll(
-									"<td align=\"left\" style=\"padding-left:15px;\">\\d+/",
-									"").replace("</td>", "").trim();
-					try {
-						if (Integer.valueOf(replyNum) < 2) {
-							rewardURLs.add(threadUrl);
-						}
-					} catch (Exception e) {
-						rewardURLs.add(threadUrl);
-					}
+				//找到最新悬赏地址
+				if (result[i].indexOf("回复数") != -1) {
+					replyNum = result[i].substring(
+							result[i].indexOf("回复数") + 43,
+							result[i].lastIndexOf("</a></p>"));
+					threadUrl = result[i].substring(
+							result[i].indexOf("href=\"") + 6, result[i].lastIndexOf("\">"));
+					rewardURLs.add(threadUrl);
 				}
+				
 			}
 
 			//开始回复
 			for (int i = 0; i < rewardURLs.size(); i++) {
-				if (isBlank(rewardURLs.get(i))) continue;
-				threadUrl = "http://forum.qidian.com/" + rewardURLs.get(i);
-				threadIds.add(threadUrl.substring(threadUrl.lastIndexOf("threadid=") + 9));
+				if (isBlank(rewardURLs.get(i)))
+					continue;
+				threadUrl = "http://forum.qidian.com/NewForum/"
+						+ rewardURLs.get(i);
+				threadIds.add(threadUrl.substring(threadUrl
+						.lastIndexOf("threadid=") + 9));
 				log.info("悬赏地址：" + threadUrl);
 				replyThread(threadUrl, "[fn=2]", false);
 			}
@@ -865,15 +957,17 @@ public class QDOperate {
 			throw new Exception(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * 发送悬赏
 	 * 若3次全部发送成功，则删除主题
+	 * 
 	 * @param bid 书号
 	 * @param threadIds 主题ID集合
 	 * @throws Exception
 	 */
-	public void releaseReward(String bid, String... threadIds) throws Exception {
+	public void releaseRewardOld(String bid, String... threadIds)
+			throws Exception {
 		HttpPost post = null;
 		HttpGet get = null;
 		HttpResponse response = null;
@@ -882,16 +976,19 @@ public class QDOperate {
 		try {
 			for (String threadId : threadIds) {
 				log.info("书号：" + bid + "， 悬赏主题ID：" + threadId);
-				get = new HttpGet(MessageFormat.format(RELEASE_REWARD_REFERER, bid, threadId));
+				get = new HttpGet(MessageFormat.format(RELEASE_REWARD_REFERER,
+						bid, threadId));
 				response = httpclient.execute(get);
 				result = EntityUtils.toString(response.getEntity()).split("\n");
 				get.abort();
 				for (String tmp : result) {
 					if (isBlank(tmp))
 						continue;
-					if (tmp.contains("Javascript:ShowIsJiang") && tmp.contains("3831365")) {
-						String[] params = tmp.substring(tmp.indexOf("ShowIsJiang(") + 12, tmp.lastIndexOf(")'>赏"))
-								.split(",");
+					if (tmp.contains("Javascript:ShowIsJiang")
+							&& tmp.contains("3831365")) {
+						String[] params = tmp.substring(
+								tmp.indexOf("ShowIsJiang(") + 12,
+								tmp.lastIndexOf(")'>赏")).split(",");
 						formparams = new ArrayList<NameValuePair>();
 						addPostParameter("bookId", params[0]);
 						addPostParameter("chapterId", params[1]);
@@ -906,12 +1003,16 @@ public class QDOperate {
 						addPostParameter("isVipBook", params[10]);
 						addPostParameter("isVipBook", "1");
 						addPostParameter("shangCiGetUserId", params[11]);
-						
+
 						post = new HttpPost(RELEASE_REWARD_URL);
-						post.setEntity(new UrlEncodedFormEntity(formparams, "UTF-8"));
+						post.setEntity(new UrlEncodedFormEntity(formparams,
+								"UTF-8"));
 						post.setHeader("Referer", RELEASE_REWARD_REFERER);
 						response = httpclient.execute(post);
-						if (EntityUtils.toString(response.getEntity()).contains("1")) {
+						System.out.println(EntityUtils.toString(response
+								.getEntity()));
+						if (EntityUtils.toString(response.getEntity())
+								.contains("1")) {
 							succ++;
 							log.info("发放悬赏成功");
 						} else {
@@ -928,28 +1029,120 @@ public class QDOperate {
 			throw new Exception(e.getMessage());
 		}
 	}
-	
+
+	/**
+	 * 发送悬赏
+	 * 若3次全部发送成功，则删除主题
+	 * 
+	 * @param bid 书号
+	 * @param threadIds 主题ID集合
+	 * @throws Exception
+	 */
+	public void releaseReward(String bid, String... threadIds) throws Exception {
+		HttpPost post = null;
+		HttpGet get = null;
+		HttpResponse response = null;
+		String[] result = null;
+		int succ = 0;
+		try {
+			for (String threadId : threadIds) {
+				log.info("书号：" + bid + "， 悬赏主题ID：" + threadId);
+				log.info(MessageFormat.format(RELEASE_REWARD_REFERER,
+						threadId));
+				get = new HttpGet(MessageFormat.format(RELEASE_REWARD_REFERER,
+						threadId));
+				response = httpclient.execute(get);
+				result = EntityUtils.toString(response.getEntity()).split("\n");
+				get.abort();
+				String chapterId = "", postId = "", threadSubject = "";
+				String getUserId = "3831365";
+				String getUserNickName = "%u75AF%u72C2%u5C0F%u6CF0%u54E5";
+				for (String tmp : result) {
+					if (isBlank(tmp))
+						continue;
+					if (tmp.indexOf("ChapterId : '") > -1) {
+						tmp = tmp.trim();
+						chapterId = tmp.substring(
+								tmp.indexOf("ChapterId : '") + 13, tmp.lastIndexOf("',"));
+					}
+					if (tmp.indexOf("ThreadSubject : '") > -1) {
+						tmp = tmp.trim();
+						threadSubject = tmp.substring(
+								tmp.indexOf("ThreadSubject : ''") + 18, tmp.lastIndexOf("',"));
+					}
+					if (tmp.indexOf("divUserBlock") > -1) {
+						tmp = tmp.trim();
+						postId = tmp.substring(
+								tmp.indexOf("divUserBlock") + 13, tmp.lastIndexOf("\">"));
+					}
+					
+				}
+				
+				formparams = new ArrayList<NameValuePair>();
+				addPostParameter("bookId", bid);
+				addPostParameter("chapterId", chapterId);
+				addPostParameter("threadId", threadId);
+				addPostParameter("getUserId", getUserId);
+				addPostParameter("getUserNickName", getUserNickName);
+				addPostParameter("postId", postId);
+				addPostParameter("threadSubject", threadSubject);
+				addPostParameter("isVipBook", "1");
+				addPostParameter("shangCiGetUserId", "0");
+
+				post = new HttpPost(RELEASE_REWARD_URL);
+				post.setEntity(new UrlEncodedFormEntity(formparams, "UTF-8"));
+				post.setHeader("Referer",
+						MessageFormat.format(RELEASE_REWARD_REFERER, threadId));
+				response = httpclient.execute(post);
+				String tmp = EntityUtils.toString(response.getEntity());
+				if (tmp.contains("1")) {
+					succ++;
+					log.info("发放悬赏成功");
+				} else if (tmp.contains("2")) {
+					log.info("悬赏满10次");
+				} else {
+					log.info("发放悬赏失败");
+				}
+				post.abort();
+			}
+			delFirstPageThread(bid);
+		} catch (Exception e) {
+			throw new Exception(e.getMessage());
+		}
+	}
+
 	/**
 	 * 得到代理集合
+	 * 
 	 * @return
 	 * @throws Exception
 	 */
 	private Map<String, Integer> getProxys() {
 		setHttpclient();
 		HttpGet get = new HttpGet("http://www.nbdaili.com/");
-		Map<String, Integer> proxyList = new HashMap<String,Integer>();
+		Map<String, Integer> proxyList = new HashMap<String, Integer>();
 		try {
 			HttpResponse response = httpclient.execute(get);
-			String[] result = EntityUtils.toString(response.getEntity()).split("\n");
+			String[] result = EntityUtils.toString(response.getEntity()).split(
+					"\n");
 			for (String tmp : result) {
 				if (tmp.contains("</tr><tr bgcolor=\"#FFFFFF\" ")) {
-					String[] proxys = tmp.trim()
-							.substring(tmp.trim().indexOf("</tr>") + 5, tmp.lastIndexOf("</table></div>"))
+					String[] proxys = tmp
+							.trim()
+							.substring(tmp.trim().indexOf("</tr>") + 5,
+									tmp.lastIndexOf("</table></div>"))
 							.split("<tr bgcolor=\"#FFFFFF\"");
 					for (String proxy : proxys) {
-						if (isBlank(proxy)) continue;
-						proxyList.put(proxy.substring(proxy.indexOf("<td>") + 4, proxy.indexOf("</td>")), 
-								Integer.valueOf(proxy.substring(proxy.indexOf("</td><td>") + 9, proxy.indexOf("</td><td>", proxy.indexOf("</td><td>") + 1))));
+						if (isBlank(proxy))
+							continue;
+						proxyList
+								.put(proxy.substring(proxy.indexOf("<td>") + 4,
+										proxy.indexOf("</td>")),
+										Integer.valueOf(proxy.substring(
+												proxy.indexOf("</td><td>") + 9,
+												proxy.indexOf(
+														"</td><td>",
+														proxy.indexOf("</td><td>") + 1))));
 					}
 				}
 			}
@@ -963,21 +1156,22 @@ public class QDOperate {
 		log.info(proxyList);
 		return proxyList;
 	}
-	
+
 	/**
 	 * 得到使用的主机代理
+	 * 
 	 * @return
 	 */
 	private HttpHost getHttpHost() {
 		HttpHost proxy = null;
 		Map<String, Integer> proxys = getProxys();
-		int use = (int)(Math.random() * 10);
+		int use = (int) (Math.random() * 10);
 		int i = 0;
 		Iterator<Entry<String, Integer>> iter = proxys.entrySet().iterator();
 		while (iter.hasNext()) {
 			Map.Entry<String, Integer> entry = iter.next();
 			if (use == i) {
-				proxy = new HttpHost(entry.getKey().toString(), 
+				proxy = new HttpHost(entry.getKey().toString(),
 						Integer.valueOf(entry.getValue().toString()));
 				log.info("使用的代理为：" + entry.getKey() + ":" + entry.getValue());
 				break;
@@ -986,9 +1180,10 @@ public class QDOperate {
 		}
 		return proxy;
 	}
-	
+
 	/**
 	 * 回复专题区的帖子
+	 * 
 	 * @param threadUrl
 	 */
 	public void replyTopic(String threadUrl) {
@@ -1008,7 +1203,8 @@ public class QDOperate {
 			}
 			//如果地址中含有#XXX的，则为锚记，必须去掉后作为请求地址
 			if (threadUrl.contains("#newPost")) {
-				threadUrl = threadUrl.substring(0, threadUrl.lastIndexOf("#newPost"));
+				threadUrl = threadUrl.substring(0,
+						threadUrl.lastIndexOf("#newPost"));
 			}
 			get = new HttpGet(threadUrl.trim());
 			response = httpclient.execute(get);
@@ -1018,11 +1214,13 @@ public class QDOperate {
 				log.error(threadUrl + " 没有找到专题区信息！");
 				return;
 			}
-			String curForumId = result.substring(result.indexOf("forumId = \"") + 11, 
+			String curForumId = result.substring(
+					result.indexOf("forumId = \"") + 11,
 					result.indexOf("forumId = \"") + 19);
-			String curThreadId = result.substring(result.indexOf("threadId = \"") + 12, 
+			String curThreadId = result.substring(
+					result.indexOf("threadId = \"") + 12,
 					result.indexOf("threadId = \"") + 21);
-			
+
 			log.info("专题区ID：" + curForumId + "，帖子ID：" + curThreadId);
 
 			//构造回帖POST参数
@@ -1056,9 +1254,10 @@ public class QDOperate {
 			replyTopic(threadUrl);
 		}
 	}
-	
+
 	/**
 	 * 回复所有专题区回复为0的主题
+	 * 
 	 * @param bid 专题区ID
 	 * @throws Exception
 	 */
@@ -1070,7 +1269,8 @@ public class QDOperate {
 		List<String> rewardURLs = new ArrayList<String>();
 
 		try {
-			response = httpclient.execute(new HttpGet(MessageFormat.format(FORUM_URL, bid)));
+			response = httpclient.execute(new HttpGet(MessageFormat.format(
+					FORUM_URL, bid)));
 			result = EntityUtils.toString(response.getEntity()).split("\n");
 			//找到所有回复为0的主题的地址
 			for (int i = 0; i < result.length; i++) {
@@ -1078,14 +1278,20 @@ public class QDOperate {
 					continue;
 				//找到最新地址
 				if (result[i].indexOf("<a target=\"_blank\" href='") != -1) {
-					threadUrl = result[i].replace("<a target=\"_blank\" href='", "")
-							.replaceAll("'\\sstyle='font-size:14px;.*", "").trim();
+					threadUrl = result[i]
+							.replace("<a target=\"_blank\" href='", "")
+							.replaceAll("'\\sstyle='font-size:14px;.*", "")
+							.trim();
 				}
 
 				//找到最新回复数
-				if (result[i].indexOf("<td align=\"left\" style=\"padding-left:15px;\">") != -1) {
-					replyNum = result[i].replace("<td align=\"left\" style=\"padding-left:15px;\">", "")
-							.replace("</td>", "").replaceAll(".*/", "").trim();
+				if (result[i]
+						.indexOf("<td align=\"left\" style=\"padding-left:15px;\">") != -1) {
+					replyNum = result[i]
+							.replace(
+									"<td align=\"left\" style=\"padding-left:15px;\">",
+									"").replace("</td>", "")
+							.replaceAll(".*/", "").trim();
 					if ("0".equals(replyNum)) {
 						rewardURLs.add(threadUrl);
 					}
@@ -1094,7 +1300,8 @@ public class QDOperate {
 
 			//开始回复
 			for (int i = 0; i < rewardURLs.size(); i++) {
-				if (isBlank(rewardURLs.get(i))) continue;
+				if (isBlank(rewardURLs.get(i)))
+					continue;
 				threadUrl = "http://forum.qidian.com/" + rewardURLs.get(i);
 				log.info("主题地址：" + threadUrl);
 				replyTopic(threadUrl);
@@ -1103,13 +1310,14 @@ public class QDOperate {
 			throw new Exception(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * 发送专题区积分奖励
+	 * 
 	 * @param bid 书号
 	 * @throws Exception
 	 */
-	public void releaseScore(String bid) throws Exception {
+	public void releaseScoreOld(String bid) throws Exception {
 		HttpPost post = null;
 		HttpGet get = null;
 		HttpResponse response = null;
@@ -1133,8 +1341,10 @@ public class QDOperate {
 					addPostParameter("operationObj", params[1]);
 					addPostParameter("userId", params[2]);
 					addPostParameter("amount", "15");
-					addPostParameter("threadName", params[3].replaceAll("\"", ""));
-					addPostParameter("operationName", params[4].replaceAll("\"", ""));
+					addPostParameter("threadName",
+							params[3].replaceAll("\"", ""));
+					addPostParameter("operationName",
+							params[4].replaceAll("\"", ""));
 					addPostParameter("operation", "1");
 					addPostParameter("threadID", params[2]);
 
@@ -1155,11 +1365,49 @@ public class QDOperate {
 	}
 	
 	/**
-	 * 删除书评区第一页所有主题
+	 * 发送书评区积分奖励
+	 * 
 	 * @param bid 书号
 	 * @throws Exception
 	 */
-	public void delFirstPageThread(String bid) throws Exception {
+	public void releaseScore(String bid) throws Exception {
+		HttpPost post = null;
+		HttpResponse response = null;
+		List<String> threadIds = getFirstPageThreadIds(bid);
+		try {
+			for (String threadId : threadIds) {
+				formparams = new ArrayList<NameValuePair>();
+				addPostParameter("forumid", bid);
+				addPostParameter("operationObj", threadId);
+				addPostParameter("userId", "3831365");
+				addPostParameter("amount", "15");
+				addPostParameter("threadName", "");
+				addPostParameter("operationName", "奖赏");
+				addPostParameter("operation", "1");
+				addPostParameter("threadID", threadId);
+				
+				post = new HttpPost(FORUM_RELEASE_URL);
+				post.setEntity(new UrlEncodedFormEntity(formparams, "UTF-8"));
+				post.setHeader("Referer", MessageFormat.format(FORUM_RELEASE_REFERER, bid, threadId, threadId));
+				response = httpclient.execute(post);
+				String postResult = EntityUtils.toString(response.getEntity());
+				log.info(threadId + postResult);
+				post.abort();
+			}
+
+			delFirstPageThread(bid);
+		} catch (Exception e) {
+			throw new Exception(e.getMessage());
+		}
+	}
+
+	/**
+	 * 删除书评区第一页所有主题
+	 * 
+	 * @param bid 书号
+	 * @throws Exception
+	 */
+	public void delFirstPageThreadOld(String bid) throws Exception {
 		HttpPost post = null;
 		HttpGet get = null;
 		HttpResponse response = null;
@@ -1177,15 +1425,20 @@ public class QDOperate {
 				if (isBlank(data))
 					continue;
 				if (data.contains("__VIEWSTATE")) {
-					viewstate = data.substring(data.indexOf("value=\"") + 7, data.lastIndexOf("\" />"));
+					viewstate = data.substring(data.indexOf("value=\"") + 7,
+							data.lastIndexOf("\" />"));
 				}
 
 				if (data.contains("__EVENTVALIDATION")) {
-					eventvalidation = data.substring(data.indexOf("value=\"") + 7, data.lastIndexOf("\" />"));
+					eventvalidation = data.substring(
+							data.indexOf("value=\"") + 7,
+							data.lastIndexOf("\" />"));
 				}
-				
+
 				if (data.contains("name=\"ctl00$ctl00$MainZonePart$MainZonePart$rptThreadList$ctl")) {
-					delThreadSign.add(data.substring(data.indexOf("name=\"") + 6, data.lastIndexOf("\"")));
+					delThreadSign
+							.add(data.substring(data.indexOf("name=\"") + 6,
+									data.lastIndexOf("\"")));
 				}
 			}
 			formparams = new ArrayList<NameValuePair>();
@@ -1193,17 +1446,22 @@ public class QDOperate {
 			addPostParameter("__EVENTARGUMENT", "");
 			addPostParameter("__VIEWSTATE", viewstate);
 			addPostParameter("__EVENTVALIDATION", eventvalidation);
-			addPostParameter("ctl00$ctl00$MainZonePart$MainZonePart$txtBody", 
+			addPostParameter("ctl00$ctl00$MainZonePart$MainZonePart$txtBody",
 					URLEncoder.encode("版主公告，在书评论区会显示", "gbk"));
-			addPostParameter("ctl00$ctl00$MainZonePart$MainZonePart$btnDeleteAll", 
+			addPostParameter(
+					"ctl00$ctl00$MainZonePart$MainZonePart$btnDeleteAll",
 					URLEncoder.encode("删除", "gbk"));
-			for(String str : delThreadSign) {
+			for (String str : delThreadSign) {
 				addPostParameter(str, "on");
 			}
-			addPostParameter("ctl00$ctl00$MainZonePart$MainZonePart$inputSearch", "");
-			addPostParameter("ctl00$ctl00$MainZonePart$MainZonePart$ddlForbidDay", "7");
-			addPostParameter("ctl00$ctl00$MainZonePart$MainZonePart$inputItem", "");
-			addPostParameter("ctl00$ctl00$MainZonePart$MainZonePart$txtReason", "");
+			addPostParameter(
+					"ctl00$ctl00$MainZonePart$MainZonePart$inputSearch", "");
+			addPostParameter(
+					"ctl00$ctl00$MainZonePart$MainZonePart$ddlForbidDay", "7");
+			addPostParameter("ctl00$ctl00$MainZonePart$MainZonePart$inputItem",
+					"");
+			addPostParameter("ctl00$ctl00$MainZonePart$MainZonePart$txtReason",
+					"");
 
 			post = new HttpPost(MessageFormat.format(FORUM_HOME_URL, bid));
 			post.setEntity(new UrlEncodedFormEntity(formparams, "UTF-8"));
@@ -1216,14 +1474,86 @@ public class QDOperate {
 			}
 			post.abort();
 			log.info("删除未执行");
-			
+
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
 		}
 	}
 	
 	/**
+	 * 删除书评区第一页所有主题
+	 * 
+	 * @param bid 书号
+	 * @throws Exception
+	 */
+	public void delFirstPageThread(String bid) throws Exception {
+		HttpPost post = null;
+		HttpResponse response = null;
+		List<String> threadIds = getFirstPageThreadIds(bid);
+		try {
+			for (String threadId : threadIds) {
+				formparams = new ArrayList<NameValuePair>();
+				addPostParameter("isgood", "false");
+				addPostParameter("forumid", bid);
+				addPostParameter("threadid", threadId);
+				addPostParameter("reviewtitle", "");
+				addPostParameter("reason", "");
+				post = new HttpPost(FORUM_DEL_URL);
+				post.setEntity(new UrlEncodedFormEntity(formparams, "UTF-8"));
+				post.setHeader("Referer", MessageFormat.format(FORUM_DEL_REFERER, bid, threadId));
+				response = httpclient.execute(post);
+				String postResult = EntityUtils.toString(response.getEntity());
+				if (postResult.indexOf("成功删除") > -1) {
+					log.info(threadId + "删除成功");
+				} else {
+					log.info(threadId + "删除失败");
+				}
+				post.abort();
+			}
+
+		} catch (Exception e) {
+			throw new Exception(e.getMessage());
+		}
+	}
+	
+	/**
+	 * 得到书评区第一页所有主题ID
+	 * 
+	 * @param bid 书号
+	 * @throws Exception
+	 */
+	public List<String> getFirstPageThreadIds(String bid) throws Exception {
+		HttpGet get = null;
+		HttpResponse response = null;
+		String[] result = null;
+		String threadId = "";
+		List<String> threadIds = new ArrayList<String>();
+		try {
+			log.info("书号：" + bid);
+			get = new HttpGet(MessageFormat.format(FORUM_HOME_URL, bid));
+			response = httpclient.execute(get);
+			result = EntityUtils.toString(response.getEntity()).split("\n");
+			get.abort();
+			for (int i = 0; i < result.length; i++) {
+				if (isBlank(result[i].trim()))
+					continue;
+				if (result[i].indexOf("splb_tab_h4") > -1) {
+					threadId = result[i].substring(
+							result[i].indexOf("threadid=") + 9,
+							result[i].lastIndexOf("\" target"));
+					threadIds.add(threadId);
+				}
+			}
+		} catch (Exception e) {
+			throw new Exception(e.getMessage());
+		}
+		
+		return threadIds;
+	}
+
+	/**
 	 * 删除001章以外的所有章节
+	 * 
 	 * @param bid 书号
 	 * @param bookName 书名
 	 * @throws Exception
@@ -1236,25 +1566,30 @@ public class QDOperate {
 		String bodyId = ""; //正文分卷ID
 		String recycleId = ""; //回收站分卷ID
 		try {
-			get = new HttpGet(
-					MessageFormat.format(AUTHOR_DEL_CHAPTER_REFERER, bid, bookName));
+			get = new HttpGet(MessageFormat.format(AUTHOR_DEL_CHAPTER_REFERER,
+					bid, bookName));
 			response = httpclient.execute(get);
 			result = EntityUtils.toString(response.getEntity()).split("\\n");
-			
-			if (result == null || result.length ==0) {
+
+			if (result == null || result.length == 0) {
 				log.info(bid + "：无法取得分卷ID");
 				return;
 			}
 			//取得正文分卷ID用来得到所有章节ID
-			for(String data : result) {
-				if (isBlank(data)) continue;
+			for (String data : result) {
+				if (isBlank(data))
+					continue;
 				if (data.contains("SelVolumeStr")) {
-					bodyId = data.substring(data.indexOf("正文</option>") - 14).replaceAll(":\\S*\\s*\\S*", "");
-					recycleId = data.substring(data.indexOf("回收站</option>") - 14, 
-							data.indexOf("回收站</option>")).replaceAll(":\\S*\\s*\\S*", "");
+					bodyId = data.substring(data.indexOf("正文</option>") - 14)
+							.replaceAll(":\\S*\\s*\\S*", "");
+					recycleId = data.substring(
+							data.indexOf("回收站</option>") - 14,
+							data.indexOf("回收站</option>")).replaceAll(
+							":\\S*\\s*\\S*", "");
 				}
-				
-				if (!isBlank(bodyId) && !isBlank(recycleId)) break;
+
+				if (!isBlank(bodyId) && !isBlank(recycleId))
+					break;
 			}
 			addPostParameter("bookId", bid);
 			addPostParameter("volumeId", bodyId);
@@ -1264,7 +1599,7 @@ public class QDOperate {
 			post.setHeader("Referer", URLEncoder.encode(MessageFormat.format(
 					AUTHOR_DEL_CHAPTER_REFERER, bid, bookName), "UTF-8"));
 			response = httpclient.execute(post);
-			
+
 			if (response.getStatusLine().getStatusCode() != 200) {
 				log.info(bid + "：无法取得正文所有章节ID");
 				return;
@@ -1273,23 +1608,33 @@ public class QDOperate {
 			post.abort();
 			for (int i = 0; i < result.length; i++) {
 				String data = result[i];
-				if (isBlank(data)) continue;
+				if (isBlank(data))
+					continue;
 				//删除001章以外的所有章节
-				if (i == 0) continue;
-				if (!data.contains("ci")) continue;
-				log.info(data.substring(data.indexOf("ci:") + 3, data.indexOf(",cn")));
+				if (i == 0)
+					continue;
+				if (!data.contains("ci"))
+					continue;
+				log.info(data.substring(data.indexOf("ci:") + 3,
+						data.indexOf(",cn")));
 				formparams = new ArrayList<NameValuePair>();
 				addPostParameter("bookId", bid);
-				addPostParameter("chapterId", data.substring(data.indexOf("ci:") + 3, data.indexOf(",cn")));
+				addPostParameter(
+						"chapterId",
+						data.substring(data.indexOf("ci:") + 3,
+								data.indexOf(",cn")));
 				addPostParameter("volumeId", recycleId);
 				addPostParameter("volumeCode", "-10");
-				addPostParameter("volumeName", URLEncoder.encode("回收站", "utf-8"));
+				addPostParameter("volumeName",
+						URLEncoder.encode("回收站", "utf-8"));
 				addPostParameter("ajaxMethod", "changevolume");
 				post = new HttpPost(GET_CHAPTERID_URL);
 				post.setEntity(new UrlEncodedFormEntity(formparams, "UTF-8"));
-				post.setHeader("Referer", URLEncoder.encode(MessageFormat.format(
-						AUTHOR_DEL_CHAPTER_REFERER, bid, bookName), "UTF-8"));
-				post.setHeader("Accept", "application/json, text/javascript, */*");
+				post.setHeader("Referer", URLEncoder.encode(MessageFormat
+						.format(AUTHOR_DEL_CHAPTER_REFERER, bid, bookName),
+						"UTF-8"));
+				post.setHeader("Accept",
+						"application/json, text/javascript, */*");
 				post.setHeader("X-Requested-With", "XMLHttpRequest");
 				response = httpclient.execute(post);
 				if (EntityUtils.toString(response.getEntity()).contains("成功")) {
@@ -1305,22 +1650,25 @@ public class QDOperate {
 			throw new Exception(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * 每日任务
+	 * 
 	 * @param checkInBooks 签到书籍数组
 	 * @param sjBook 三江投票书号
 	 * @throws Exception
 	 */
-	public void dailyTash(String[] checkInBooks, String sjBook) throws Exception{
+	public void dailyTash(String[] checkInBooks, String sjBook)
+			throws Exception {
 		getGift();
 		sign();
 		bookCheckIn(checkInBooks);
 		voteSJ(sjBook);
 	}
-	
+
 	/**
 	 * 对书评区第一页所有主题进行加精
+	 * 
 	 * @param bid 书号
 	 * @throws Exception
 	 */
@@ -1342,34 +1690,44 @@ public class QDOperate {
 				if (isBlank(data))
 					continue;
 				if (data.contains("__VIEWSTATE")) {
-					viewstate = data.substring(data.indexOf("value=\"") + 7, data.lastIndexOf("\" />"));
+					viewstate = data.substring(data.indexOf("value=\"") + 7,
+							data.lastIndexOf("\" />"));
 				}
 
 				if (data.contains("__EVENTVALIDATION")) {
-					eventvalidation = data.substring(data.indexOf("value=\"") + 7, data.lastIndexOf("\" />"));
+					eventvalidation = data.substring(
+							data.indexOf("value=\"") + 7,
+							data.lastIndexOf("\" />"));
 				}
-				
+
 				if (data.contains("name=\"ctl00$ctl00$MainZonePart$MainZonePart$rptThreadList$ctl")) {
-					addThreadSign.add(data.substring(data.indexOf("name=\"") + 6, data.lastIndexOf("\"")));
+					addThreadSign
+							.add(data.substring(data.indexOf("name=\"") + 6,
+									data.lastIndexOf("\"")));
 				}
 			}
-			
+
 			formparams = new ArrayList<NameValuePair>();
 			addPostParameter("__EVENTTARGET", "");
 			addPostParameter("__EVENTARGUMENT", "");
 			addPostParameter("__VIEWSTATE", viewstate);
 			addPostParameter("__EVENTVALIDATION", eventvalidation);
-			addPostParameter("ctl00$ctl00$MainZonePart$MainZonePart$txtBody", 
+			addPostParameter("ctl00$ctl00$MainZonePart$MainZonePart$txtBody",
 					URLEncoder.encode("版主公告，在书评论区会显示", "gbk"));
-			addPostParameter("ctl00$ctl00$MainZonePart$MainZonePart$btnGoodAll", 
+			addPostParameter(
+					"ctl00$ctl00$MainZonePart$MainZonePart$btnGoodAll",
 					URLEncoder.encode("加精", "gbk"));
-			for(String str : addThreadSign) {
+			for (String str : addThreadSign) {
 				addPostParameter(str, "on");
 			}
-			addPostParameter("ctl00$ctl00$MainZonePart$MainZonePart$inputSearch", "");
-			addPostParameter("ctl00$ctl00$MainZonePart$MainZonePart$ddlForbidDay", "7");
-			addPostParameter("ctl00$ctl00$MainZonePart$MainZonePart$inputItem", "");
-			addPostParameter("ctl00$ctl00$MainZonePart$MainZonePart$txtReason", "");
+			addPostParameter(
+					"ctl00$ctl00$MainZonePart$MainZonePart$inputSearch", "");
+			addPostParameter(
+					"ctl00$ctl00$MainZonePart$MainZonePart$ddlForbidDay", "7");
+			addPostParameter("ctl00$ctl00$MainZonePart$MainZonePart$inputItem",
+					"");
+			addPostParameter("ctl00$ctl00$MainZonePart$MainZonePart$txtReason",
+					"");
 
 			post = new HttpPost(MessageFormat.format(FORUM_HOME_URL, bid));
 			post.setEntity(new UrlEncodedFormEntity(formparams, "UTF-8"));
@@ -1382,14 +1740,15 @@ public class QDOperate {
 			}
 			post.abort();
 			log.info("加精未执行");
-			
+
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * 定时发帖
+	 * 
 	 * @param specialHour 特定的时间
 	 * @param specialMinute
 	 * @param post 帖子属性
@@ -1425,60 +1784,65 @@ public class QDOperate {
 		}
 	}
 
-    /**
-     * 领取2013.01.17之前的经验
-     */
-    public void getOldExp() throws Exception {
-        HttpResponse response = null;
-        HttpGet get = null;
-        String result = "";
-        try {
-            get = new HttpGet(MessageFormat.format(GET_OLD_EXP_URL, Math.random()));
-            get.setHeader("Referer", "http://me.qidian.com/Index.aspx");
-            response = httpclient.execute(get);
-            result = EntityUtils.toString(response.getEntity());
-            log.info(result.substring(result.indexOf("Msg\":\"") + 6, result.lastIndexOf("\"")));
-            get.abort();
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
-    }
+	/**
+	 * 领取2013.01.17之前的经验
+	 */
+	public void getOldExp() throws Exception {
+		HttpResponse response = null;
+		HttpGet get = null;
+		String result = "";
+		try {
+			get = new HttpGet(MessageFormat.format(GET_OLD_EXP_URL,
+					Math.random()));
+			get.setHeader("Referer", "http://me.qidian.com/Index.aspx");
+			response = httpclient.execute(get);
+			result = EntityUtils.toString(response.getEntity());
+			log.info(result.substring(result.indexOf("Msg\":\"") + 6,
+					result.lastIndexOf("\"")));
+			get.abort();
+		} catch (Exception e) {
+			throw new Exception(e.getMessage());
+		}
+	}
 
-    /**
-     * 宠物签到
-     */
-    public void signMyPet() throws Exception {
-        visitURLByGet(MY_PET_URL);
-    }
-    
-    /**
-     * 获取活跃度
-     * @throws Exception
-     */
-    public void getActivity() throws Exception {
-    	visitURLByGet(ACTIVITY_HOME_URL);
-    	visitURLByGet(ACTIVITY_HOME_EXECUTE);
-		String[] friends = new String[] { "3188362", "130116907", "12685579", "21456503", "115921869", "610769" };
+	/**
+	 * 宠物签到
+	 */
+	public void signMyPet() throws Exception {
+		visitURLByGet(MY_PET_URL);
+	}
+
+	/**
+	 * 获取活跃度
+	 * 
+	 * @throws Exception
+	 */
+	public void getActivity() throws Exception {
+		visitURLByGet(ACTIVITY_HOME_URL);
+		visitURLByGet(ACTIVITY_HOME_EXECUTE);
+		String[] friends = new String[] { "3188362", "130116907", "12685579",
+				"21456503", "115921869", "610769" };
 		for (int i = 0; i < friends.length; i++) {
 			visitURLByGet(MessageFormat.format(FRIEND_HOME_URL, friends[i]));
 		}
-    }
-    
-    /**
-     * 通过get方式访问指定网址
-     * @param url
-     * @throws Exception
-     */
-    private void visitURLByGet(String url) throws Exception {
-    	 try {
-             HttpGet get = new HttpGet(url);
-             get.setHeader("Referer", "http://me.qidian.com/Index.aspx");
-             httpclient.execute(get);
-             get.abort();
-         } catch (Exception e) {
-             throw new Exception(e.getMessage());
-         }
-    }
+	}
+
+	/**
+	 * 通过get方式访问指定网址
+	 * 
+	 * @param url
+	 * @throws Exception
+	 */
+	private void visitURLByGet(String url) throws Exception {
+		try {
+			HttpGet get = new HttpGet(url);
+			get.setHeader("Referer", "http://me.qidian.com/Index.aspx");
+			httpclient.execute(get);
+			get.abort();
+		} catch (Exception e) {
+			throw new Exception(e.getMessage());
+		}
+	}
 
 	/**
 	 * 释放HttpClient连接
@@ -1489,9 +1853,10 @@ public class QDOperate {
 			httpclient = null;
 		}
 	}
-	
+
 	/**
 	 * 添加POST提价参数
+	 * 
 	 * @param name
 	 * @param value
 	 * @return
@@ -1502,6 +1867,7 @@ public class QDOperate {
 
 	/**
 	 * 根据key得到Header的值
+	 * 
 	 * @param header
 	 * @param key
 	 * @return
@@ -1515,9 +1881,10 @@ public class QDOperate {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * 解析起点短网址
+	 * 
 	 * @param url
 	 * @return
 	 */
