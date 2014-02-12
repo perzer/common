@@ -829,9 +829,8 @@ public class QDOperate {
 							data.lastIndexOf("\" />"));
 				}
 
-				if (data.contains("正文")) {
-					bookVolume = data.substring(data.indexOf("value=\"") + 7,
-							data.lastIndexOf("\">"));
+				if (data.contains("正文") && data.contains("option")) {
+					bookVolume = data.substring(data.indexOf("<option value=\"") + 15, data.indexOf("\">"));
 				}
 
 				if (!isBlank(viewstate) && !isBlank(eventvalidation)
@@ -1591,6 +1590,7 @@ public class QDOperate {
 				if (!isBlank(bodyId) && !isBlank(recycleId))
 					break;
 			}
+			formparams = new ArrayList<NameValuePair>();
 			addPostParameter("bookId", bid);
 			addPostParameter("volumeId", bodyId);
 			addPostParameter("ajaxMethod", "chapterdataget");
@@ -1862,6 +1862,9 @@ public class QDOperate {
 	 * @return
 	 */
 	public void addPostParameter(String name, String value) {
+		if (this.formparams == null) {
+			this.formparams = new ArrayList<NameValuePair>();
+		}
 		this.formparams.add(new BasicNameValuePair(name, value));
 	}
 
