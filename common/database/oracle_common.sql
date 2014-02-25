@@ -86,6 +86,16 @@ BEGIN
 	SELECT SEQ_CONTROL_RELATION_ACCOUNT.NEXTVAL INTO:NEW.ID FROM DUAL;
 END;
 
+--删除指定用户的所有数据
+select 'drop ' || t.object_type || ' ' || t.object_name || ';' from user_objects t
+where t.object_type not in ('INDEX','LOB')
+order by t.object_type,t.object_name
+--删除JOB
+SELECT 'EXEC DBMS_JOB.REMOVE(' || T.JOB || ');'
+	FROM USER_JOBS T
+UNION ALL
+SELECT 'COMMIT;' FROM DUAL;
+
 --查询字符集编码
 select parameter,value from nls_database_parameters where parameter like 'NLS_CHARACTERSET';
 
